@@ -1,0 +1,616 @@
+<title>Type of Malware</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* Concept: a dotted pink desktop where every idea opens as a chunky app window.
+     Each malware gets its own color; the deck's navy ink, lilac shadow and yellow windows carry over. */
+  :root{
+    --bg:#FFDBDD; --bg2:#FFC4C7; --ink:#0A0540; --ink2:#4B4180;
+    --card:#FFFBC9; --card2:#FFFFFF; --line:#0A0540; --sh:#0A0540;
+    --dot:rgba(10,5,64,.13); --art:#FFDBDD; --lilac:#C9B8F2; --focus:#2F57E8;
+    --green:#00C48C; --coral:#FF6B6B; --orange:#FF8A5C; --blue:#5B86FF; --sun:#FFC83D;
+    --on-acc:#0A0540;
+    --display:'Bungee',Impact,'Arial Black',sans-serif;
+    --body:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#100A3C; --bg2:#1B1257; --ink:#FFE6E8; --ink2:#C7BCF0;
+      --card:#231A6B; --card2:#2D2384; --line:#FFE6E8; --sh:#FF6B6B;
+      --dot:rgba(255,230,232,.08); --lilac:#6A55C9; --focus:#8FB0FF; color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#100A3C; --bg2:#1B1257; --ink:#FFE6E8; --ink2:#C7BCF0;
+    --card:#231A6B; --card2:#2D2384; --line:#FFE6E8; --sh:#FF6B6B;
+    --dot:rgba(255,230,232,.08); --lilac:#6A55C9; --focus:#8FB0FF; color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font:400 17px/1.55 var(--body); color:var(--ink);
+    background-color:var(--bg);
+    background-image:radial-gradient(var(--dot) 1.6px, transparent 1.6px);
+    background-size:24px 24px;
+    padding-block:0 48px;
+    padding-left:max(16px, env(safe-area-inset-left, 0px));
+    padding-right:max(16px, env(safe-area-inset-right, 0px));
+    overflow-x:clip;
+  }
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);background:var(--bg);z-index:10}
+  .wrap{max-width:1120px;margin:0 auto}
+  img{display:block;max-width:100%;height:auto}
+  h1,h2,h3,p,ul,ol,figure{margin:0}
+  a{color:inherit}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+  section[id], header[id]{scroll-margin-top:92px}
+
+  /* ---------- nav ---------- */
+  .nav{position:sticky;top:env(safe-area-inset-top, 0px);z-index:9;padding-block:10px 12px;background:linear-gradient(var(--bg) 72%, transparent)}
+  .nav-in{display:flex;align-items:center;gap:10px;background:var(--card);border:3px solid var(--line);border-radius:999px;box-shadow:4px 4px 0 var(--sh);padding:7px 8px 7px 16px}
+  .brand{font:400 1rem/1 var(--display);white-space:nowrap;text-decoration:none}
+  .nav-links{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0;padding:2px}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{flex:none;display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;font:700 .85rem/1 var(--body);text-decoration:none;border:2px solid transparent}
+  .nav-links a:hover{border-color:var(--line);background:var(--card2)}
+  .nav-links a i{width:10px;height:10px;border-radius:50%;background:var(--c);border:2px solid var(--line)}
+  .toggle{flex:none;font:700 .8rem/1 var(--mono);padding:9px 12px;border-radius:999px;border:3px solid var(--line);background:var(--sun);color:var(--on-acc);cursor:pointer}
+
+  /* ---------- buttons, pills ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;font:400 .95rem/1 var(--display);letter-spacing:.02em;color:var(--on-acc);background:var(--green);border:3px solid var(--line);border-radius:14px;box-shadow:5px 5px 0 var(--sh);text-decoration:none;cursor:pointer;transition:transform .12s, box-shadow .12s}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--sh)}
+  .btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--sh)}
+  .btn.alt{background:var(--sun)}
+  .btn.coral{background:var(--coral)}
+  .pill{display:inline-block;padding:5px 12px;border-radius:999px;background:var(--t,var(--sun));color:var(--on-acc);border:3px solid var(--line);font:700 .78rem/1.2 var(--mono);letter-spacing:.03em;text-transform:uppercase}
+
+  /* ---------- hero ---------- */
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:32px;align-items:center;padding-block:34px 26px}
+  .kicker{font:700 .85rem/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+  .hero h1{font:400 clamp(2.7rem,13.5vw,6.4rem)/.95 var(--display);text-transform:uppercase;text-shadow:5px 5px 0 var(--lilac);text-wrap:balance;margin-bottom:22px}
+  .hero h1 span{display:block}
+  .hero .sub{font-size:1.2rem;font-weight:500;max-width:34em;margin-bottom:24px}
+  .cta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:22px}
+  .by{font:600 1rem/1.3 var(--body);color:var(--ink2)}
+  .by b{color:var(--ink);font-weight:800}
+  .hero-art{position:relative;max-width:440px;justify-self:center;width:100%}
+  .art{background:var(--art);border:3px solid var(--line);border-radius:26px;box-shadow:8px 8px 0 var(--sh);overflow:hidden;display:grid;place-items:center}
+  .art img{width:100%;margin-inline:auto}
+  .sticker{position:absolute;width:84px;filter:drop-shadow(3px 3px 0 var(--sh));animation:bob 3.6s ease-in-out infinite}
+  .sticker.s1{top:-18px;left:-22px;transform:rotate(-12deg)}
+  .sticker.s2{bottom:-14px;right:-18px;width:92px;animation-delay:-1.4s}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -9px}}
+
+  .ticker{overflow:hidden;border:3px solid var(--line);border-radius:14px;background:var(--sun);color:var(--on-acc);box-shadow:5px 5px 0 var(--sh);margin-block:10px 6px}
+  .ticker-track{display:flex;width:max-content;animation:tick 32s linear infinite}
+  .ticker span{flex:none;padding:10px 22px;font:400 .95rem/1 var(--display);letter-spacing:.04em;white-space:nowrap}
+  .ticker span::after{content:"/";margin-left:44px;opacity:.5}
+  @keyframes tick{to{transform:translateX(-50%)}}
+
+  /* ---------- section scaffolding ---------- */
+  .sec{padding-block:54px 8px}
+  .eyebrow{font:700 .85rem/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:12px}
+  .sec-title{font:400 clamp(2rem,6.4vw,3.7rem)/1.05 var(--display);text-transform:uppercase;text-wrap:balance;margin-bottom:14px}
+  .hl{background:var(--t,var(--coral));color:var(--on-acc);padding:.02em .22em;box-shadow:6px 6px 0 var(--sh);border:3px solid var(--line);display:inline;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .lede{font-size:1.15rem;font-weight:500;max-width:40em;margin-bottom:26px}
+  .mal-chips{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:26px}
+  .tagline{font:700 1.05rem/1.3 var(--body)}
+
+  /* ---------- window component ---------- */
+  .win{background:var(--card);color:var(--ink);border:3px solid var(--line);border-radius:18px;box-shadow:7px 7px 0 var(--sh);overflow:hidden;min-width:0;height:100%;transition:transform .15s, box-shadow .15s}
+  .win:hover{transform:translate(-2px,-2px);box-shadow:9px 9px 0 var(--sh)}
+  .win-bar{display:flex;align-items:center;gap:12px;padding:9px 14px;background:var(--t,var(--lilac));color:var(--on-acc);border-bottom:3px solid var(--line);font:700 .8rem/1 var(--mono);letter-spacing:.02em}
+  .dots{display:flex;gap:6px}
+  .dots i{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--on-acc)}
+  .win-file{overflow-wrap:anywhere}
+  .win-body{padding:18px 20px 22px}
+  .win-body.flush{padding:0}
+  .win-h{display:flex;gap:10px;align-items:center;font:400 1.15rem/1.15 var(--display);letter-spacing:.01em;margin-bottom:12px}
+  .num{flex:none;display:inline-grid;place-items:center;min-width:2rem;height:2rem;border-radius:9px;background:var(--t);color:var(--on-acc);border:3px solid var(--line);font-size:.95rem}
+  .big{font-size:1.15rem;line-height:1.5;font-weight:500}
+  .cap{font:500 .9rem/1.4 var(--body);color:var(--ink2);margin-top:10px}
+
+  .mal-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px}
+  .c-def{grid-column:span 7}
+  .c-art{grid-column:span 5;display:flex}
+  .c-art .art{flex:1;padding:12px}
+  .c-how,.c-fx,.c-story,.c-shield{grid-column:span 6}
+
+  .fx{list-style:none;padding:0;display:grid;gap:10px}
+  .fx li{display:flex;gap:12px;align-items:flex-start;font-weight:600}
+  .fx li::before{content:"";flex:none;width:18px;height:18px;margin-top:.3em;background:var(--t);border:3px solid var(--line);border-radius:5px;transform:rotate(12deg)}
+  .lead-in{font-weight:600;margin-bottom:10px}
+
+  .flow{list-style:none;padding:0;display:grid}
+  .flow li{position:relative;padding:0 0 20px 50px;font-weight:600;min-height:38px}
+  .flow li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:-2px;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:var(--t);color:var(--on-acc);border:3px solid var(--line);font:400 .95rem/1 var(--display)}
+  .flow{counter-reset:s}
+  .flow li::after{content:"";position:absolute;left:16.5px;top:36px;bottom:0;width:3px;background:var(--line)}
+  .flow li:last-child{padding-bottom:0}
+  .flow li:last-child::after{display:none}
+  .quote{font:600 1.1rem/1.45 var(--body);padding:14px 16px;border:3px solid var(--line);border-radius:14px;background:var(--card2)}
+
+  .mini{display:flex;gap:14px;align-items:center;margin-top:16px}
+  .mini .art{width:130px;flex:none;border-radius:18px;box-shadow:4px 4px 0 var(--sh);padding:6px}
+  .mini .art.wide{width:190px}
+  .mini p{font:500 .92rem/1.4 var(--body);color:var(--ink2)}
+  .swap{display:grid;gap:10px;margin-top:16px}
+  .swap div{display:flex;gap:10px;align-items:center;padding:10px 12px;border:3px solid var(--line);border-radius:12px;background:var(--card2);font:700 .85rem/1.3 var(--mono);overflow-wrap:anywhere}
+  .swap b{flex:none;padding:3px 8px;border-radius:6px;border:2.5px solid var(--line);color:var(--on-acc)}
+  .swap .sus b{background:var(--coral)}
+  .swap .safe b{background:var(--green)}
+
+  .lab{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:16px}
+  .pc{aspect-ratio:1/.85;border:3px solid var(--line);border-radius:8px;background:var(--green);animation:catch 9s linear infinite;animation-delay:calc(var(--i)*.7s);position:relative}
+  .pc::after{content:"";position:absolute;left:50%;bottom:-9px;width:40%;height:5px;margin-left:-20%;background:var(--line);border-radius:3px}
+  @keyframes catch{0%,8%{background:var(--green)}16%,82%{background:var(--coral)}92%,100%{background:var(--green)}}
+
+  .shield{border:0;padding:0;margin:0;min-width:0}
+  .chk{position:relative;display:flex;gap:12px;align-items:center;padding:10px 12px;margin-bottom:9px;border:3px solid var(--line);border-radius:12px;background:var(--card2);font-weight:600;cursor:pointer}
+  .chk input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+  .chk .box{flex:none;width:24px;height:24px;border:3px solid var(--line);border-radius:7px;display:grid;place-items:center;background:var(--bg)}
+  .chk input:checked ~ .box{background:var(--t)}
+  .chk input:checked ~ .box::after{content:"";width:10px;height:5px;border-left:3px solid var(--on-acc);border-bottom:3px solid var(--on-acc);transform:rotate(-45deg) translate(1px,-1px)}
+  .chk:has(input:checked){background:color-mix(in srgb, var(--t) 24%, var(--card2))}
+  .chk:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:2px}
+  .meter{height:16px;border:3px solid var(--line);border-radius:99px;background:var(--card2);overflow:hidden;margin-top:14px}
+  .meter i{display:block;height:100%;width:0;background:var(--t);transition:width .3s}
+  .meter-txt{font:700 .85rem/1.3 var(--mono);margin-top:8px}
+  .shield-art{margin-top:16px;max-width:260px}
+
+  /* ---------- the question (agenda) ---------- */
+  .q-grid{display:grid;grid-template-columns:.8fr 1.5fr .8fr;gap:24px;align-items:center}
+  .q-grid .art{padding:10px}
+  .agenda{list-style:none;padding:0;display:grid;gap:12px;counter-reset:a}
+  .agenda li{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:center;counter-increment:a}
+  .agenda li::before{content:counter(a);display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--c);color:var(--on-acc);border:3px solid var(--line);font:400 1.15rem/1 var(--display)}
+  .agenda b{display:block;font:800 1.1rem/1.2 var(--body)}
+  .agenda small{font:500 .92rem/1.3 var(--body);color:var(--ink2)}
+
+  /* ---------- lineup ---------- */
+  .lineup{display:grid;gap:16px}
+  .lhead,.lrow{display:grid;grid-template-columns:1fr 1.15fr 1.45fr 1.5fr 1.3fr}
+  .lhead{padding:0 14px;font:700 .78rem/1.2 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
+  .lrow{background:var(--card);border:3px solid var(--line);border-radius:16px;box-shadow:5px 5px 0 var(--sh);overflow:hidden}
+  .lrow > *{padding:14px;min-width:0}
+  .lrow .who{background:var(--t);color:var(--on-acc);font:400 1.1rem/1.15 var(--display);display:flex;align-items:center;border-right:3px solid var(--line);text-transform:uppercase}
+  .lrow .cell{font-weight:500;border-right:3px solid var(--line)}
+  .lrow .cell:last-child{border-right:0}
+  .yn{display:inline-block;margin-bottom:6px;padding:2px 10px;border-radius:999px;border:2.5px solid var(--line);font:700 .78rem/1.5 var(--mono);text-transform:uppercase;color:var(--on-acc)}
+  .yn.yes{background:var(--coral)} .yn.no{background:var(--green)} .yn.mix{background:var(--sun)}
+
+  /* ---------- video ---------- */
+  .reel video{display:block;width:100%;aspect-ratio:16/9;background:#000;border-bottom:3px solid var(--line)}
+  .chapters{display:flex;flex-wrap:wrap;gap:10px;padding:16px 18px 20px;align-items:center}
+  .chapters .lbl{font:700 .8rem/1 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--ink2);margin-right:4px}
+  .chap{font:700 .85rem/1 var(--mono);padding:9px 12px;border-radius:999px;border:3px solid var(--line);background:var(--card2);color:var(--ink);cursor:pointer}
+  .chap:hover{background:var(--sun);color:var(--on-acc)}
+  .chap[aria-current="true"]{background:var(--blue);color:var(--on-acc)}
+
+  /* ---------- quiz ---------- */
+  .hud{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px;font:700 .85rem/1 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+  .hud .grow{flex:1;min-width:140px}
+  .prog{height:14px;border:3px solid var(--line);border-radius:99px;background:var(--card2);overflow:hidden}
+  .prog i{display:block;height:100%;background:var(--blue);transition:width .3s}
+  .qtext{font:800 clamp(1.2rem,3.6vw,1.6rem)/1.3 var(--body);margin:16px 0 16px;text-wrap:balance}
+  .qtext:focus{outline:none}
+  .opts{display:grid;gap:11px}
+  .opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:12px 14px;font:600 1.02rem/1.35 var(--body);color:var(--ink);background:var(--card2);border:3px solid var(--line);border-radius:14px;box-shadow:4px 4px 0 var(--sh);cursor:pointer;transition:transform .12s, box-shadow .12s}
+  .opt:hover:not([aria-disabled="true"]){transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--sh)}
+  .opt .key{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;border:3px solid var(--line);background:var(--sun);color:var(--on-acc);font:700 .85rem/1 var(--mono)}
+  .opt[aria-disabled="true"]{cursor:default}
+  .opt.good{background:var(--green);color:var(--on-acc);animation:pop .3s}
+  .opt.bad{background:var(--coral);color:var(--on-acc)}
+  .opt.dim{opacity:.55}
+  @keyframes pop{50%{transform:scale(1.02)}}
+  .fb{margin-top:18px;padding:14px 16px;border:3px dashed var(--line);border-radius:14px;background:var(--bg2)}
+  .fb:empty{display:none}
+  .fb .verdict{font:400 1.2rem/1.2 var(--display);margin-bottom:6px}
+  .fb .why{font-weight:500;margin-bottom:12px}
+  .fb .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .score-big{font:400 clamp(3.2rem,14vw,6rem)/1 var(--display);text-shadow:4px 4px 0 var(--lilac)}
+  .rank{font:400 1.35rem/1.2 var(--display);margin:8px 0 6px}
+  .brk{display:grid;gap:10px;margin:18px 0}
+  .brk div{display:grid;grid-template-columns:110px 1fr 44px;gap:12px;align-items:center;font:700 .85rem/1 var(--mono)}
+  .brk .bar{height:16px;border:3px solid var(--line);border-radius:99px;background:var(--card2);overflow:hidden}
+  .brk .bar i{display:block;height:100%;background:var(--c)}
+  .missed{margin:14px 0 18px;padding-left:1.2em;display:grid;gap:8px;font-weight:500}
+  .missed b{font-weight:800}
+
+  /* ---------- footer ---------- */
+  .foot{margin-top:70px;position:relative;text-align:center;padding:44px 20px 40px;background:var(--bg2);border:3px solid var(--line);border-radius:28px;box-shadow:8px 8px 0 var(--sh)}
+  .foot h2{font:400 clamp(2.4rem,11vw,5.6rem)/1 var(--display);text-shadow:5px 5px 0 var(--lilac);text-transform:uppercase;margin-bottom:12px}
+  .habits{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px auto 22px;max-width:760px}
+  .habits .pill{font-size:.85rem}
+  .foot .env{width:110px;margin:0 auto 14px}
+  .foot .sticker{width:70px}
+  .foot .sticker.s1{top:14px;left:14px}
+  .foot .sticker.s2{top:auto;bottom:14px;right:14px}
+  .fine{font:500 .9rem/1.4 var(--body);color:var(--ink2)}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;gap:30px}
+    .hero-art{max-width:340px}
+    .c-def,.c-art,.c-how,.c-fx,.c-story,.c-shield{grid-column:1/-1}
+    .c-art .art{max-width:420px}
+    .q-grid{grid-template-columns:1fr 1fr}
+    .q-grid .agenda-win{grid-column:1/-1;order:-1}
+    .lhead{display:none}
+    .lrow{grid-template-columns:1fr}
+    .lrow .who,.lrow .cell{border-right:0}
+    .lrow .who{border-bottom:3px solid var(--line)}
+    .lrow .cell{border-bottom:2px dashed var(--line)}
+    .lrow .cell:last-child{border-bottom:0}
+    .lrow .cell::before{content:attr(data-l);display:block;font:700 .75rem/1.2 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px}
+  }
+  @media (max-width:520px){
+    body{font-size:16px}
+    .nav-in{padding-left:12px}
+    .brand{font-size:.85rem}
+    .win-body{padding:16px 16px 20px}
+    .brk div{grid-template-columns:84px 1fr 38px}
+    .sticker{width:64px}
+    .mini{flex-direction:column;align-items:flex-start}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .pc:nth-child(-n+5){background:var(--coral)}
+  }
+
+  /* drawn icons (inline SVG sprite) */
+  svg.ic{display:block;width:100%;height:auto;max-height:340px}
+  .o{stroke:var(--line);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+  .w{fill:var(--card2)} .p{fill:var(--lilac)} .g{fill:var(--green)} .r{fill:var(--coral)} .y{fill:var(--sun)} .b{fill:var(--blue)} .n{fill:var(--orange)} .k{fill:var(--line)}
+  .wo{fill:none;stroke:var(--line);stroke-width:13;stroke-linecap:round;stroke-linejoin:round}
+  .wc{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round} .wc.n{stroke:var(--orange)} .wc.g{stroke:var(--green)} .wc.r{stroke:var(--coral)}
+  .art{padding:14px} .sticker{height:auto}
+  .mini .art{padding:6px}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="i-phone" viewBox="0 0 120 100"><rect class="o b" x="36" y="6" width="48" height="88" rx="9"/><rect class="o w" x="41" y="14" width="38" height="70" rx="3"/><g transform="translate(60 38) scale(0.9)"><path class="o" fill="none" d="M-12 0v-8a12 12 0 0124 0v8"/><rect class="o y" x="-17" y="0" width="34" height="26" rx="5"/><circle class="k" cx="0" cy="11" r="4"/><rect class="k" x="-1.5" y="12" width="3" height="8"/></g><path class="k" d="M48 70h5v3h-5zM56 70h5v3h-5zM64 70h5v3h-5zM72 70h4v3h-4z"/><path class="o g2" fill="none" d="M60 6V-2M40 2h12M80 2H68"/></symbol><symbol id="i-bulb" viewBox="0 0 120 100"><path class="o y" d="M60 12c-18 0-30 13-30 29 0 10 5 17 10 23 3 4 4 7 4 11h32c0-4 1-7 4-11 5-6 10-13 10-23 0-16-12-29-30-29z"/><rect class="o w" x="46" y="78" width="28" height="7" rx="3"/><rect class="o w" x="50" y="85" width="20" height="7" rx="3"/><path class="o" fill="none" d="M52 62V44c0-6 16-6 16 0 0 6-8 6-8 12M10 40h12M98 40h12M20 14l9 9M100 14l-9 9"/></symbol><symbol id="i-magnify" viewBox="0 0 120 100"><rect class="o w" x="14" y="12" width="84" height="64" rx="5"/><path class="o b" d="M14 12h84v12H14z"/><rect class="o p" x="24" y="32" width="28" height="36" rx="2"/><circle class="o g" cx="84" cy="44" r="10"/><path class="o" fill="none" d="M79 44l4 4 8-9"/><circle class="o" fill="#ffffff55" cx="58" cy="52" r="24"/><path class="o" stroke-width="7" d="M76 70l22 22"/></symbol><symbol id="i-bug-teal" viewBox="0 0 120 100"><g class="o"><path fill="none" d="M38 44L22 36M38 56L18 56M40 68L24 80M82 44L98 36M82 56L102 56M80 68L96 80M52 20L46 8M68 20L74 8"/></g><ellipse class="o b" cx="60" cy="56" rx="24" ry="22"/><circle class="o y" cx="60" cy="30" r="11"/><circle class="k" cx="55" cy="54" r="4"/><circle class="k" cx="65" cy="54" r="4"/><path class="k" d="M56 66h8v6h-8z"/></symbol><symbol id="i-bug-red" viewBox="0 0 120 100"><g class="o"><path fill="none" d="M38 44L22 36M38 56L18 56M40 68L24 80M82 44L98 36M82 56L102 56M80 68L96 80M52 20L46 8M68 20L74 8"/></g><ellipse class="o r" cx="60" cy="56" rx="24" ry="22"/><circle class="o y" cx="60" cy="30" r="11"/><circle class="k" cx="55" cy="54" r="4"/><circle class="k" cx="65" cy="54" r="4"/><path class="k" d="M56 66h8v6h-8z"/></symbol><symbol id="i-envelope" viewBox="0 0 120 100"><rect class="o w" x="14" y="26" width="92" height="62" rx="5"/><path class="o" fill="none" d="M14 30l46 34 46-34"/><text x="60" y="76" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="800" font-size="30" fill="#2F57E8">@</text><g transform="translate(20 20) scale(1)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g><g transform="translate(100 24) scale(1.2)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g><g transform="translate(96 92) scale(1)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g></symbol><symbol id="i-usb" viewBox="0 0 120 100"><rect class="o b" x="42" y="28" width="62" height="34" rx="8"/><rect class="o w" x="12" y="36" width="34" height="18" rx="2"/><rect class="k" x="19" y="42" width="6" height="6"/><rect class="k" x="31" y="42" width="6" height="6"/><g transform="translate(22 16) scale(1.1)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g><g transform="translate(96 14) scale(1)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g><g transform="translate(110 72) scale(1)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g><g transform="translate(40 82) scale(1.2)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g><g transform="translate(78 84) scale(1)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g></symbol><symbol id="i-laptop-alert" viewBox="0 0 120 100"><path class="o w" d="M26 12h68a4 4 0 014 4v50H22V16a4 4 0 014-4z"/><rect class="o p" x="28" y="18" width="64" height="42" rx="2"/><path class="o y" d="M60 24l18 32H42z"/><path class="k" d="M58.5 33h3v12h-3zM58.5 48h3v3h-3z"/><path class="o w" d="M10 70h100l-8 14H18z"/><path class="o" fill="none" d="M50 77h20"/></symbol><symbol id="i-anti-laptop" viewBox="0 0 120 100"><path class="o w" d="M26 12h68a4 4 0 014 4v50H22V16a4 4 0 014-4z"/><rect class="o p" x="28" y="18" width="64" height="42" rx="2"/><path class="o r" d="M60 21l17 6v13c0 12-8 19-17 23-9-4-17-11-17-23V27z"/><path class="o" fill="none" d="M52 40l6 6 11-12"/><path class="o w" d="M10 70h100l-8 14H18z"/><path class="o" fill="none" d="M50 77h20"/><g transform="translate(14 14) scale(1.1)"><circle class="k" r="7"/><path class="k" d="M-10 0h-4M10 0h4M0-10v-4M0 10v4M-7-7l-3-3M7-7l3-3M-7 7l-3 3M7 7l3 3"/><circle fill="#fff" cx="-2.5" cy="-1.5" r="1.6"/><circle fill="#fff" cx="2.5" cy="-1.5" r="1.6"/></g></symbol><symbol id="i-worm-monitor" viewBox="0 0 120 100"><rect class="o w" x="16" y="8" width="88" height="58" rx="6"/><rect class="o p" x="23" y="15" width="74" height="44" rx="3"/><path class="wo" d="M32 48C40 28 52 54 62 36S82 30 86 44"/><path class="wc n" d="M32 48C40 28 52 54 62 36S82 30 86 44"/><circle class="k" cx="86" cy="44" r="2.5"/><path class="o w" d="M50 66h20l4 14H46z"/><rect class="o w" x="36" y="80" width="48" height="8" rx="3"/></symbol><symbol id="i-worm-monitor2" viewBox="0 0 120 100"><rect class="o w" x="16" y="8" width="88" height="58" rx="6"/><rect class="o p" x="23" y="15" width="74" height="44" rx="3"/><path class="wo" d="M30 36C42 26 48 50 60 40S80 52 88 34"/><path class="wc g" d="M30 36C42 26 48 50 60 40S80 52 88 34"/><path class="wo" d="M34 52C46 42 54 58 66 50S82 56 90 46"/><path class="wc r" d="M34 52C46 42 54 58 66 50S82 56 90 46"/><path class="o w" d="M50 66h20l4 14H46z"/><rect class="o w" x="36" y="80" width="48" height="8" rx="3"/></symbol><symbol id="i-worm-docs" viewBox="0 0 120 100"><rect class="o w" x="22" y="14" width="62" height="74" rx="4"/><rect class="o y" x="38" y="10" width="56" height="62" rx="4" transform="rotate(6 66 41)"/><path class="o" fill="none" d="M32 28h38M32 38h38M32 48h24"/><path class="wo" d="M18 80C34 64 48 92 62 74S86 70 98 82"/><path class="wc n" d="M18 80C34 64 48 92 62 74S86 70 98 82"/></symbol><symbol id="i-lock-laptop" viewBox="0 0 120 100"><path class="o w" d="M26 12h68a4 4 0 014 4v50H22V16a4 4 0 014-4z"/><rect class="o p" x="28" y="18" width="64" height="42" rx="2"/><g transform="translate(60 22) scale(0.95)"><path class="o" fill="none" d="M-12 0v-8a12 12 0 0124 0v8"/><rect class="o y" x="-17" y="0" width="34" height="26" rx="5"/><circle class="k" cx="0" cy="11" r="4"/><rect class="k" x="-1.5" y="12" width="3" height="8"/></g><path class="o w" d="M10 70h100l-8 14H18z"/><path class="o" fill="none" d="M50 77h20"/><g class="o r"><rect x="2" y="22" width="14" height="14" transform="rotate(-12 9 29)"/><rect x="104" y="14" width="14" height="14" transform="rotate(10 111 21)"/></g><path class="o" fill="none" d="M5 25l8 8M13 25l-8 8"/></symbol><symbol id="i-trojan" viewBox="0 0 120 100"><rect class="o w" x="16" y="8" width="88" height="58" rx="6"/><rect class="o p" x="23" y="15" width="74" height="44" rx="3"/><path class="o r" transform="translate(30 6) scale(.6)" d="M30 90V74c0-16 8-26 16-36l-6-20 14 9c8-6 20-4 28 6l12 22-18 8c-5-5-9-4-11 3-2 9 2 18 10 24z"/><circle class="k" cx="68" cy="29" r="2.4"/><path class="o w" d="M50 66h20l4 14H46z"/><rect class="o w" x="36" y="80" width="48" height="8" rx="3"/></symbol><symbol id="i-trojan-icon" viewBox="0 0 120 100"><circle class="o w" cx="60" cy="50" r="40" stroke-width="6" style="stroke:#E24B1F"/><rect class="o r" x="32" y="32" width="56" height="34" rx="3"/><circle class="k" cx="60" cy="46" r="8"/><rect class="k" x="56" y="52" width="8" height="7"/><path class="o" fill="none" d="M48 74h24M60 66v8"/></symbol></defs></svg>
+<div class="wrap">
+
+  <nav class="nav" aria-label="Sections">
+    <div class="nav-in">
+      <a class="brand" href="#top">Malware 101</a>
+      <div class="nav-links">
+        <a href="#virus" style="--c:var(--green)"><i></i>Virus</a>
+        <a href="#worm" style="--c:var(--orange)"><i></i>Worm</a>
+        <a href="#trojan" style="--c:var(--blue)"><i></i>Trojan</a>
+        <a href="#ransomware" style="--c:var(--sun)"><i></i>Ransomware</a>
+        <a href="#watch" style="--c:var(--lilac)"><i></i>Watch</a>
+        <a href="#quiz" style="--c:var(--coral)"><i></i>Quiz</a>
+      </div>
+      <button class="toggle" id="themeBtn" type="button" aria-pressed="false">Dark</button>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div>
+      <p class="kicker"><span class="pill">Cyber safety</span><span class="pill" style="--t:var(--green)">Class presentation</span></p>
+      <h1><span>Type of</span><span>Malware</span></h1>
+      <p class="sub">Virus, Worm, Trojan Horse and Ransomware. What they are, how they sneak in, what they wreck, and how to avoid becoming the main character in a hacking story.</p>
+      <div class="cta">
+        <a class="btn" href="#quiz">Take the quiz</a>
+        <a class="btn alt" href="#watch">Watch the recap</a>
+      </div>
+      <p class="by">Presented by <b>Alena G8 Courage</b></p>
+    </div>
+    <div class="hero-art">
+      <figure class="art"><svg class="ic" viewBox="0 0 120 100" role="img" aria-label="Illustration of a hand holding a phone with a padlock and a row of password dots, wired up to a circuit pattern" style="max-height:360px"><use href="#i-phone"/></svg></figure>
+      <svg class="sticker s1" viewBox="0 0 120 100" aria-hidden="true"><use href="#i-bug-teal"/></svg>
+      <svg class="sticker s2" viewBox="0 0 120 100" aria-hidden="true"><use href="#i-bug-red"/></svg>
+    </div>
+  </header>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>Think before you click</span><span>Update your stuff</span><span>Official downloads only</span><span>Strong passwords, no cap</span><span>Antivirus on</span><span>Test your backups</span>
+      <span>Think before you click</span><span>Update your stuff</span><span>Official downloads only</span><span>Strong passwords, no cap</span><span>Antivirus on</span><span>Test your backups</span>
+    </div>
+  </div>
+
+  <main>
+    <!-- The question -->
+    <section class="sec" id="question">
+      <p class="eyebrow">The game plan</p>
+      <h2 class="sec-title"><span class="hl" style="--t:var(--sun)">The question</span></h2>
+      <p class="lede">Every type of malware gets the same five checks. Follow the numbers and you can compare them side by side.</p>
+      <div class="q-grid">
+        <figure class="art"><svg class="ic" viewBox="0 0 120 100" role="img" aria-label="Two hands reaching toward a glowing green light bulb" style="max-height:360px"><use href="#i-bulb"/></svg></figure>
+        <div class="agenda-win">
+          <article class="win" style="--t:var(--sun)">
+            <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="win-file">the_question.txt</span></div>
+            <div class="win-body">
+              <ol class="agenda">
+                <li style="--c:var(--green)"><span><b>The definition</b><small>What is it?</small></span></li>
+                <li style="--c:var(--orange)"><span><b>How it spreads or enters a computer</b><small>How does it get in?</small></span></li>
+                <li style="--c:var(--blue)"><span><b>The effects</b><small>What does it wreck?</small></span></li>
+                <li style="--c:var(--sun)"><span><b>Real-life scenario</b><small>What does it look like out in the wild?</small></span></li>
+                <li style="--c:var(--coral)"><span><b>The prevention</b><small>How do you stop it?</small></span></li>
+              </ol>
+            </div>
+          </article>
+        </div>
+        <figure class="art"><svg class="ic" viewBox="0 0 120 100" role="img" aria-label="Two people holding a giant magnifying glass over a browser window with a cross and a check mark" style="max-height:360px"><use href="#i-magnify"/></svg></figure>
+      </div>
+    </section>
+
+    <div id="mal-root"></div>
+
+    <!-- Lineup -->
+    <section class="sec" id="lineup">
+      <p class="eyebrow">Cheat sheet</p>
+      <h2 class="sec-title"><span class="hl" style="--t:var(--lilac)">The lineup</span></h2>
+      <p class="lede">All four at a glance. The big difference is whether you have to do something for it to spread.</p>
+      <div class="lineup">
+        <div class="lhead" aria-hidden="true"><span>Malware</span><span>Needs you to act?</span><span>How it gets in</span><span>What it wrecks</span><span>Best shield</span></div>
+        <div class="lrow" style="--t:var(--green)"><div class="who">Virus</div>
+          <div class="cell" data-l="Needs you to act?"><span class="yn mix">Usually</span><br>You open a file or plug something in.</div>
+          <div class="cell" data-l="How it gets in">Exploits a weak spot, attaches a code file to the system, then propagates.</div>
+          <div class="cell" data-l="What it wrecks">Slow computer, corrupted files, data deleted on its own.</div>
+          <div class="cell" data-l="Best shield">Antivirus, updates, checking USB drives.</div></div>
+        <div class="lrow" style="--t:var(--orange)"><div class="who">Worm</div>
+          <div class="cell" data-l="Needs you to act?"><span class="yn no">No</span><br>It copies itself on its own.</div>
+          <div class="cell" data-l="How it gets in">Networks and storage media, no user interaction needed.</div>
+          <div class="cell" data-l="What it wrecks">Performance drops, growing slowness, network paralysis.</div>
+          <div class="cell" data-l="Best shield">Security patches.</div></div>
+        <div class="lrow" style="--t:var(--blue)"><div class="who">Trojan horse</div>
+          <div class="cell" data-l="Needs you to act?"><span class="yn yes">Yes</span><br>You download or install it.</div>
+          <div class="cell" data-l="How it gets in">Disguised as a legit app or program.</div>
+          <div class="cell" data-l="What it wrecks">Espionage, slow internet, laggy computer, data corruption or loss.</div>
+          <div class="cell" data-l="Best shield">Official downloads only, no pirated software.</div></div>
+        <div class="lrow" style="--t:var(--sun)"><div class="who">Ransomware</div>
+          <div class="cell" data-l="Needs you to act?"><span class="yn mix">Often</span><br>A fake email or a sketchy site starts it.</div>
+          <div class="cell" data-l="How it gets in">Security holes, leaked or weak passwords, malicious websites.</div>
+          <div class="cell" data-l="What it wrecks">Financial loss, data leaks, reputation damage, operations down.</div>
+          <div class="cell" data-l="Best shield">Updates, fake-email radar, tested recovery.</div></div>
+      </div>
+    </section>
+
+    <!-- Video -->
+    <section class="sec" id="watch">
+      <p class="eyebrow">Watch</p>
+      <h2 class="sec-title"><span class="hl" style="--t:var(--blue)">The recap reel</span></h2>
+      <p class="lede">The whole presentation in under a minute. Tap a chapter to jump to that malware.</p>
+      <article class="win reel" style="--t:var(--blue)">
+        <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="win-file">recap_reel.mp4</span></div>
+        <div class="win-body flush">
+          <video id="reel" controls playsinline preload="metadata" poster="data:image/jpeg;base64,...POSTER_DATA_OMITTED_HERE...">
+            <source src="data:video/mp4;base64,...VIDEO_DATA_OMITTED_HERE..." type="video/mp4">
+            Your browser can't play this video.
+          </video>
+          <div class="chapters" id="chapters">
+            <span class="lbl">Chapters</span>
+            <button class="chap" type="button" data-t="0">Intro</button>
+            <button class="chap" type="button" data-t="3.5">The question</button>
+            <button class="chap" type="button" data-t="8">Virus</button>
+            <button class="chap" type="button" data-t="19">Worm</button>
+            <button class="chap" type="button" data-t="30">Trojan</button>
+            <button class="chap" type="button" data-t="41">Ransomware</button>
+            <button class="chap" type="button" data-t="52">Outro</button>
+          </div>
+        </div>
+      </article>
+      <p class="cap">The video is built from the presentation slides and has a short soundtrack. Press play when you're ready.</p>
+    </section>
+
+    <!-- Quiz -->
+    <section class="sec" id="quiz">
+      <p class="eyebrow">Test yourself</p>
+      <h2 class="sec-title"><span class="hl" style="--t:var(--coral)">Malware quiz</span></h2>
+      <p class="lede">14 questions straight from the slides, reshuffled every run. Wrong answers explain themselves, and you can retry as many times as you want.</p>
+      <article class="win" style="--t:var(--coral)">
+        <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="win-file">malware_quiz.exe</span></div>
+        <div class="win-body" id="quiz-root"></div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <svg class="sticker s1" viewBox="0 0 120 100" aria-hidden="true"><use href="#i-bug-teal"/></svg>
+    <svg class="sticker s2" viewBox="0 0 120 100" aria-hidden="true"><use href="#i-bug-red"/></svg>
+    <svg class="env art" style="width:130px;padding:6px" viewBox="0 0 120 100" role="img" aria-label="An email envelope with a suspicious letter and little virus faces around it"><use href="#i-envelope"/></svg>
+    <h2>Thank you</h2>
+    <p class="by">Presented by <b>Alena G8 Courage</b></p>
+    <div class="habits">
+      <span class="pill" style="--t:var(--green)">Keep antivirus on</span>
+      <span class="pill" style="--t:var(--orange)">Update everything</span>
+      <span class="pill" style="--t:var(--blue)">Download from official sites</span>
+      <span class="pill" style="--t:var(--sun)">Beware of fake emails</span>
+      <span class="pill" style="--t:var(--coral)">Test your recovery plan</span>
+    </div>
+    <p class="fine">Made from the "Type of Malware" presentation.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  /* ---------- theme toggle ---------- */
+  var rootEl=document.documentElement, btn=document.getElementById('themeBtn');
+  try{var saved=localStorage.getItem('malware-theme'); if(saved==='light'||saved==='dark') rootEl.setAttribute('data-theme',saved);}catch(e){}
+  function isDark(){var t=rootEl.getAttribute('data-theme'); if(t) return t==='dark'; return window.matchMedia('(prefers-color-scheme: dark)').matches;}
+  function syncBtn(){var d=isDark(); btn.textContent=d?'Light':'Dark'; btn.setAttribute('aria-pressed',String(d)); btn.setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode');}
+  btn.addEventListener('click',function(){var n=isDark()?'light':'dark'; rootEl.setAttribute('data-theme',n); try{localStorage.setItem('malware-theme',n);}catch(e){} syncBtn();});
+  syncBtn();
+
+  /* ---------- malware sections ---------- */
+  var IMG_UNUSED={'usb':[290,259],'laptop-alert':[420,210],'anti-laptop':[690,629],'worm-monitor':[390,370],'worm-docs':[228,255],'worm-monitor2':[410,320],'lock-laptop':[326,269],'trojan':[290,290],'trojan-icon':[250,240],'envelope':[315,339]};
+  function img(name,alt,cls){return '<figure class="art '+(cls||'')+'"><svg class="ic" viewBox="0 0 120 100" role="img" aria-label="'+alt+'"><use href="#i-'+name+'"/></svg></figure>';}
+  function win(n,file,title,body){return '<article class="win"><div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="win-file">'+file+'</span></div><div class="win-body"><h3 class="win-h"><span class="num">'+n+'</span>'+title+'</h3>'+body+'</div></article>';}
+  function list(a){return '<ul class="fx">'+a.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';}
+  function steps(a){return '<ol class="flow">'+a.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ol>';}
+  var lab='<div class="lab" aria-hidden="true">'+[0,1,2,3,4,5,6,7].map(function(k){return '<span class="pc" style="--i:'+k+'"></span>';}).join('')+'</div><p class="cap">Illustration: each lab PC catches it from the one before. Nobody clicks anything.</p>';
+
+  var MAL=[
+    {id:'virus',n:1,title:'Virus malware',color:'var(--green)',chip:'Hitches a ride on your files',tag:'Sneaky file, big mess.',
+     def:'A virus is a type of malware designed to damage a system, or to alter or delete data.',
+     defImg:img('laptop-alert','A person at a laptop that shows a warning triangle'),
+     how:'<p>A virus spreads by exploiting vulnerabilities in a computer, attaching a code file to the system, and then propagating further.</p><div class="mini">'+img('usb','A USB flash drive surrounded by little black virus characters')+'<p>Unknown USB drives and shared files are classic doorways.</p></div>',
+     fx:list(['The computer becomes slow','Files become corrupted','Data can be deleted on its own']),
+     story:steps(['A friend sends you a file named "Tugas.docx"','You open it','Suddenly your photos and documents become corrupted or go missing']),
+     shield:['Enable antivirus','Perform regular updates','Avoid suspicious links','Check external devices','Use strong passwords'],
+     shieldImg:img('anti-laptop','A laptop showing a virus and a big red ANTI shield, with a bug on top','shield-art')},
+    {id:'worm',n:2,title:'Worm malware',color:'var(--orange)',chip:'No click needed',tag:'Spreads on its own.',
+     def:'Malware worms are a type of malware that is capable of replicating and spreading itself automatically over a network without requiring help from the user.',
+     defImg:img('worm-monitor','A cracked computer monitor with worms crawling out of it'),
+     how:'<p>Worms spread automatically through networks and storage media, without requiring any user interaction.</p><div class="mini">'+img('worm-docs','A worm weaving through a stack of documents')+'<p>If a worm is on one machine, everything it is connected to is a target.</p></div>',
+     fx:'<p class="lead-in">The primary effects include:</p>'+list(['Performance degradation','Increasing slowness','Network paralysis']),
+     story:'<p class="quote">All the computers in the school lab suddenly became very slow one by one.</p>'+lab,
+     shield:['Install security patches','Install trusted antivirus software','Ignore suspicious attachments','Avoid unsecured public Wi-Fi','Update your browser and virus database'],
+     shieldImg:img('worm-monitor2','A cracked monitor with a green worm and a red worm wrapped around it','shield-art')},
+    {id:'trojan',n:3,title:'Trojan horse malware',color:'var(--blue)',chip:'Disguised as legit',tag:'Looks like a gift. Is not a gift.',
+     def:'A Trojan horse is a type of malware that typically disguises itself as something like a program or application in order to trick users into downloading it.',
+     defImg:img('trojan','A cracked monitor with a red horse head pushing out of the screen'),
+     how:'<p>A Trojan horse enters a computer by disguising itself as something legitimate, such as an application or program, tricking users into downloading or installing it.</p><div class="swap"><div class="sus"><b>SUS</b>ultra-free-photoshop-CRACKED.exe</div><div class="safe"><b>SAFE</b>The app\'s official website</div></div><p class="cap">Made-up examples to show the difference.</p>',
+     fx:'<p class="lead-in">The effects of this malware include:</p>'+list(['Espionage','Slow internet','Slow and laggy computer','Data corruption or loss']),
+     story:'<p class="quote">All the computers in the school lab suddenly became very slow one by one.</p><div class="mini">'+img('trojan-icon','A red computer icon with a skull inside a round orange frame')+'<p>Something that looked harmless is running in the background.</p></div>',
+     shield:['Activate a trusted antivirus','Download items from official websites','Avoid pirated software','Ignore emails from unknown sources'],
+     shieldImg:''},
+    {id:'ransomware',n:4,title:'Ransomware',color:'var(--sun)',chip:'Data hostage situation',tag:'Locks your stuff, then sends the bill.',
+     def:'Ransomware is a type of malware designed to generate profit for its operators by locking or encrypting a victim\'s data or blocking access to their device, and then demanding payment in exchange for restoring access to that data.',
+     defImg:img('lock-laptop','A laptop with a padlock on screen surrounded by red windows marked with crosses'),
+     how:'<p class="lead-in">Ransomware spreads within computers through:</p>'+list(['Exploitation of security vulnerabilities','Leaked credentials and weak passwords','Malicious websites']),
+     fx:list(['Financial loss','Data leaks','Reputational damage','Operational disruption']),
+     story:steps(['An employee opens a dangerous file from a fake email','Ransomware spreads across the whole office network and the central server overnight','Public services go down completely and a ransom demand of billions of rupiah appears']),
+     shield:['Perform regular updates','Beware of fake emails','Avoid pirated software','Test recovery procedures'],
+     shieldImg:''}
+  ];
+
+  function section(m){
+    var shield='<fieldset class="shield"><legend class="lead-in" style="padding:0">Tick what you already do:</legend>'+
+      m.shield.map(function(s){return '<label class="chk"><input type="checkbox"><span class="box" aria-hidden="true"></span><span>'+s+'</span></label>';}).join('')+
+      '<div class="meter" aria-hidden="true"><i></i></div><p class="meter-txt" aria-live="polite"></p></fieldset>'+(m.shieldImg||'');
+    return '<section class="sec" id="'+m.id+'" style="--t:'+m.color+'">'+
+      '<p class="eyebrow">Malware '+m.n+' of 4</p>'+
+      '<h2 class="sec-title"><span class="hl">'+m.title+'</span></h2>'+
+      '<div class="mal-chips"><span class="pill">'+m.chip+'</span><span class="tagline">'+m.tag+'</span></div>'+
+      '<div class="mal-grid">'+
+        '<div class="c-def">'+win(1,'1_definition.txt','What is it?','<p class="big">'+m.def+'</p>')+'</div>'+
+        '<div class="c-art">'+m.defImg+'</div>'+
+        '<div class="c-how">'+win(2,'2_how_it_gets_in.exe','How it gets in',m.how)+'</div>'+
+        '<div class="c-fx">'+win(3,'3_damage_report.log','The effects',m.fx)+'</div>'+
+        '<div class="c-story">'+win(4,'4_real_life.mov','Real-life scenario',m.story)+'</div>'+
+        '<div class="c-shield">'+win(5,'5_shield_up.sh','How to prevent it',shield)+'</div>'+
+      '</div></section>';
+  }
+  document.getElementById('mal-root').innerHTML=MAL.map(section).join('');
+
+  document.querySelectorAll('.shield').forEach(function(fs){
+    var boxes=fs.querySelectorAll('input'), bar=fs.querySelector('.meter i'), txt=fs.querySelector('.meter-txt');
+    function up(){
+      var n=0; boxes.forEach(function(b){if(b.checked)n++;});
+      var t=boxes.length, p=Math.round(n/t*100);
+      bar.style.width=p+'%';
+      var mood=n===0?'Wide open':n===t?'Fully armored':n/t>=.5?'Almost there':'Lowkey exposed';
+      txt.textContent=n+' of '+t+' shields up. '+mood+'.';
+    }
+    boxes.forEach(function(b){b.addEventListener('change',up);}); up();
+  });
+
+  /* ---------- video chapters ---------- */
+  var reel=document.getElementById('reel'), chaps=[].slice.call(document.querySelectorAll('.chap'));
+  chaps.forEach(function(c){c.addEventListener('click',function(){
+    try{reel.currentTime=parseFloat(c.getAttribute('data-t'));}catch(e){}
+    var p=reel.play(); if(p&&p.catch)p.catch(function(){});
+  });});
+  function markChap(){
+    var t=reel.currentTime, cur=0;
+    chaps.forEach(function(c,k){if(t>=parseFloat(c.getAttribute('data-t'))-0.05)cur=k;});
+    chaps.forEach(function(c,k){if(k===cur&&t>0)c.setAttribute('aria-current','true');else c.removeAttribute('aria-current');});
+  }
+  reel.addEventListener('timeupdate',markChap); reel.addEventListener('seeked',markChap);
+
+  /* ---------- quiz ---------- */
+  var TYPES={virus:['Virus','var(--green)'],worm:['Worm','var(--orange)'],trojan:['Trojan horse','var(--blue)'],ransom:['Ransomware','var(--sun)']};
+  var Q=[
+    {t:'virus',q:'Which malware is designed to damage a system or alter and delete data, and spreads by attaching a code file to the system?',o:['Virus','Worm','Trojan horse','Ransomware'],why:'A virus attaches a code file to a system, then propagates further. The damage is slowdowns, corrupted files and deleted data.'},
+    {t:'worm',q:'Which malware can copy itself across a network with zero help from the user?',o:['Worm','Virus','Trojan horse','Ransomware'],why:'Worms replicate and spread on their own over networks and storage media. No clicks needed.'},
+    {t:'trojan',q:'A "free" program you downloaded was secretly malware all along. Which type is that?',o:['Trojan horse','Worm','Virus','Ransomware'],why:'A Trojan horse disguises itself as something legit, like an app, to trick you into downloading or installing it.'},
+    {t:'ransom',q:'Which malware locks or encrypts your data and demands payment to give you access back?',o:['Ransomware','Virus','Worm','Trojan horse'],why:'Ransomware is built to make money for its operators by holding your data or device hostage.'},
+    {t:'virus',q:'A friend sends "Tugas.docx". You open it, and your photos and documents become corrupted or vanish. What hit you?',o:['Virus','Worm','Ransomware','Trojan horse'],why:'This is the virus scenario from the slides: a file you opened damaged and deleted data. No ransom demand and no network spread here.'},
+    {t:'worm',q:'Every computer in the school lab slows down one by one, and nobody opened anything. Which malware spreads like this?',o:['Worm','Virus','Trojan horse','Ransomware'],why:'Worms hop across the network by themselves, so machines get hit one after another without any user interaction.'},
+    {t:'worm',q:'Which of these is a listed effect of worms?',o:['Network paralysis','A ransom note on the screen','A fake app asking to be installed','Espionage on your files'],why:'Worms cause performance degradation, increasing slowness and network paralysis.'},
+    {t:'trojan',q:'Espionage is one of the effects of which malware?',o:['Trojan horse','Worm','Virus','Ransomware'],why:'Trojan effects include espionage, slow internet, a slow and laggy computer, and data corruption or loss.'},
+    {t:'trojan',q:'Which habit helps block Trojans?',o:['Download only from official websites','Install cracked software to save money','Open attachments from unknown senders','Switch your antivirus off'],why:'Official websites, trusted antivirus, no pirated software and ignoring emails from unknown sources all help against Trojans.'},
+    {t:'ransom',q:'An employee opens a file from a fake email. By night the office network and central server are locked, public services are down, and a huge payment demand appears. What is it?',o:['Ransomware','Virus','Worm','Trojan horse'],why:'Spreading through the network and demanding a ransom is ransomware. Fake emails are one of its favorite doors.'},
+    {t:'ransom',q:'Which ransomware prevention step is about bouncing back if things go wrong?',o:['Test recovery procedures','Beware of fake emails','Perform regular updates','Avoid pirated software'],why:'All four are on the ransomware list, but testing recovery procedures is the one that gets your data and services back.'},
+    {t:'virus',q:'Which is a smart habit against viruses?',o:['Check external devices like USB drives before using them','Plug in any USB drive you find','Click every link that shows up','Skip all updates'],why:'Checking external devices is on the virus list, together with antivirus, updates, avoiding suspicious links and strong passwords.'},
+    {t:'ransom',q:'Which one is NOT an effect of ransomware?',o:['A free upgrade for your device','Financial loss','Data leaks','Operational disruption'],why:'Ransomware brings financial loss, data leaks, reputational damage and operational disruption. Nobody gets a free upgrade.'},
+    {t:'worm',q:'Which step is on the prevention list for worms?',o:['Install security patches','Use any public Wi-Fi without a password','Open every attachment','Ignore browser updates'],why:'Install security patches, run trusted antivirus, ignore suspicious attachments, avoid unsecured public Wi-Fi, and keep your browser and virus database updated.'}
+  ];
+  var root=document.getElementById('quiz-root');
+  var order,idx,score,streak,best,answered,cur,log;
+  function shuffle(a){var b=a.slice(),k,j,x;for(k=b.length-1;k>0;k--){j=Math.floor(Math.random()*(k+1));x=b[k];b[k]=b[j];b[j]=x;}return b;}
+  function pickOne(a){return a[Math.floor(Math.random()*a.length)];}
+  function start(){order=shuffle(Q.map(function(_,n){return n;}));idx=0;score=0;streak=0;best=0;log=[];render(true);}
+  function hud(){
+    return '<div class="hud"><span>Question '+(idx+1)+' / '+order.length+'</span><span id="hud-score">Score '+score+'</span><span id="hud-streak">Streak '+streak+'</span>'+
+      '<div class="grow prog" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="'+order.length+'" aria-valuenow="'+idx+'"><i style="width:'+Math.round(idx/order.length*100)+'%"></i></div></div>';
+  }
+  function render(first){
+    if(idx>=order.length){return result();}
+    var q=Q[order[idx]], opts=shuffle(q.o);
+    answered=false; cur={q:q,opts:opts};
+    root.innerHTML=hud()+'<h3 class="qtext" id="qtext" tabindex="-1">'+q.q+'</h3>'+
+      '<div class="opts" role="group" aria-labelledby="qtext">'+opts.map(function(o,k){return '<button type="button" class="opt" data-k="'+k+'"><span class="key">'+'ABCD'.charAt(k)+'</span><span>'+o+'</span></button>';}).join('')+'</div>'+
+      '<div class="fb" id="fb" aria-live="polite"></div>';
+    if(!first){root.querySelector('#qtext').focus({preventScroll:true});}
+  }
+  function pick(k){
+    if(answered)return; answered=true;
+    var q=cur.q, ok=cur.opts[k]===q.o[0];
+    if(ok){score++;streak++;if(streak>best)best=streak;}else{streak=0;}
+    log.push({q:q.q,t:q.t,ok:ok,right:q.o[0],picked:cur.opts[k]});
+    var btns=root.querySelectorAll('.opt');
+    btns.forEach(function(b,n){
+      b.setAttribute('aria-disabled','true');
+      if(cur.opts[n]===q.o[0])b.classList.add('good'); else if(n===k)b.classList.add('bad'); else b.classList.add('dim');
+    });
+    root.querySelector('#hud-score').textContent='Score '+score;
+    root.querySelector('#hud-streak').textContent='Streak '+streak;
+    var last=idx===order.length-1;
+    root.querySelector('#fb').innerHTML='<p class="verdict">'+(ok?pickOne(['W. Correct.','Big brain moment.','Locked in.','No cap, you got it.']):pickOne(['L. Not this time.','Plot twist: nope.','Oof, so close.']))+'</p>'+
+      '<p class="why">'+(ok?'':'Answer: <b>'+q.o[0]+'</b>. ')+q.why+'</p>'+
+      '<div class="row"><span class="pill" style="--t:'+TYPES[q.t][1]+'">'+TYPES[q.t][0]+'</span><button type="button" class="btn" data-next>'+(last?'See results':'Next question')+'</button></div>';
+    var nb=root.querySelector('[data-next]'); if(nb)nb.focus({preventScroll:true});
+  }
+  function result(){
+    var pct=Math.round(score/order.length*100);
+    var rank=pct===100?'Certified Malware Slayer':pct>=80?'Cyber-safe, no cap':pct>=60?'Lowkey vulnerable':'Certified clicker. Run it back.';
+    var msg=pct===100?'Flawless. Nothing gets past you.':pct>=80?'Strong run. A couple of details to polish.':pct>=60?'Solid base. Rewatch the recap and try again.':'Totally fixable. Skim the sections above, then retry.';
+    var per=Object.keys(TYPES).map(function(t){
+      var tot=0,good=0; log.forEach(function(l){if(l.t===t){tot++;if(l.ok)good++;}});
+      return '<div><span>'+TYPES[t][0]+'</span><span class="bar" style="--c:'+TYPES[t][1]+'"><i style="width:'+(tot?Math.round(good/tot*100):0)+'%"></i></span><span>'+good+'/'+tot+'</span></div>';
+    }).join('');
+    var missed=log.filter(function(l){return !l.ok;});
+    root.innerHTML='<div class="hud"><span>Finished</span><span>Best streak '+best+'</span></div>'+
+      '<p class="score-big">'+score+'/'+order.length+'</p><p class="rank">'+rank+'</p><p class="big">'+msg+'</p>'+
+      '<div class="brk">'+per+'</div>'+
+      (missed.length?'<h3 class="win-h" style="margin-top:6px">Review these</h3><ol class="missed">'+missed.map(function(l){return '<li>'+l.q+' <b>Answer: '+l.right+'</b></li>';}).join('')+'</ol>':'<p class="big" style="margin:14px 0 18px">No misses to review.</p>')+
+      '<button type="button" class="btn coral" data-restart>Play again</button>';
+  }
+  root.addEventListener('click',function(e){
+    var o=e.target.closest('.opt'); if(o){pick(parseInt(o.getAttribute('data-k'),10));return;}
+    if(e.target.closest('[data-next]')){idx++;render(false);return;}
+    if(e.target.closest('[data-restart]')){start();}
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    if(e.target.closest&&e.target.closest('button,a,input,select,textarea,video'))return;
+    var r=root.getBoundingClientRect(), vh=window.innerHeight;
+    if(!(r.top<vh*0.75&&r.bottom>vh*0.25))return;
+    if(!cur||idx>=order.length)return;
+    var m={'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3}[e.key.toLowerCase()];
+    if(m!==undefined&&!answered&&m<cur.opts.length){pick(m);e.preventDefault();}
+    else if(answered&&(e.key==='Enter'||e.key==='ArrowRight')){idx++;render(false);e.preventDefault();}
+  });
+  start();
+})();
+</script>
